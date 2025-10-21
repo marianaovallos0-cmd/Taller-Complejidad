@@ -28,40 +28,23 @@ public class Controller {
 		}
 		return archivo.getAbsolutePath();
 	}
-
 	private boolean obtenerKeySensitive() {
         return ventanaPrincipal.getKeySensitive().isSelected();
     }
-
 	private String busquedaCadena() {
 		return ventanaPrincipal.getTxtTexto().getText();
 	}
 
 	public void buscar() {
+
 		String ruta = obtenerRutaArchivoSeleccionado();
 		boolean aplicaKeySensitive = obtenerKeySensitive();
 		String rutaCadena = busquedaCadena();
 
 
-		if (ruta == null ) {
-			return;
-		}
-
-		System.out.println(aplicaKeySensitive+" esto existe");
-		System.out.println(ruta+" esto existe");
-
-
 		String contenidoArchivo = archivo.leerArchivo(ruta);
-		ArrayList<Integer> caracteres = busquedaKMP.buscarPatron(contenidoArchivo,rutaCadena,aplicaKeySensitive);
-
-        for (Integer caractere : caracteres) {
-            System.out.println(caractere);
-        }
-
-
-
-
-
+		ArrayList<Integer> inicios = busquedaKMP.buscarPatron(contenidoArchivo,rutaCadena,aplicaKeySensitive);
+		ventanaPrincipal.resaltarCoincidencias(inicios, rutaCadena.length());
 
 	}
 
