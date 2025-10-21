@@ -66,6 +66,11 @@ public class VentanaPrincipal extends JFrame   {
 		btnCargarArchivo = new JButton("Cargar Archivo");
 		btnCargarArchivo.setBounds(20, 460, 200, 40);
 		add(btnCargarArchivo);
+		
+		lblResultados.setBounds(20, 520, 300, 30);
+		lblResultados.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		add(lblResultados);
+
 
 		btnCargarArchivo.addActionListener(this::accionCargarArchivo);
 		
@@ -84,6 +89,12 @@ public class VentanaPrincipal extends JFrame   {
 		int resp = chooser.showOpenDialog(this);
 		if (resp == JFileChooser.APPROVE_OPTION) {
 			File seleccionado = chooser.getSelectedFile();
+			
+			/*if (!seleccionado.getName().toLowerCase().endsWith(".txt")) {
+			    JOptionPane.showMessageDialog(this, "Solo se permiten archivos con extensión .txt", 
+			        "Advertencia", JOptionPane.WARNING_MESSAGE);
+			    return;
+			}*/
 
 			if (seleccionado != null) {
 				try {
@@ -155,6 +166,10 @@ public class VentanaPrincipal extends JFrame   {
 	public File getArchivoSeleccionado() {
 		return archivoSeleccionado;
 	}
+	public String getTextoArea() {
+	    return areaDeTexto.getText();
+	}
+
 
 
 }

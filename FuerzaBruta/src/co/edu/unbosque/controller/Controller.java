@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 public class Controller {
 	
 	public VentanaPrincipal ventanaPrincipal;
@@ -36,16 +38,25 @@ public class Controller {
 	}
 
 	public void buscar() {
+	    boolean aplicaKeySensitive = obtenerKeySensitive();
+	    String cadenaBuscar = busquedaCadena();
 
-		String ruta = obtenerRutaArchivoSeleccionado();
-		boolean aplicaKeySensitive = obtenerKeySensitive();
-		String rutaCadena = busquedaCadena();
+	  
+	    String contenidoArchivo = ventanaPrincipal.getTextoArea();
 
+	    if (contenidoArchivo == null || contenidoArchivo.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Primero debes cargar un archivo.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+	    if (cadenaBuscar == null || cadenaBuscar.isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Debes ingresar una palabra o frase para buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
 
-		String contenidoArchivo = archivo.leerArchivo(ruta);
-		ArrayList<Integer> inicios = busquedaKMP.buscarPatron(contenidoArchivo,rutaCadena,aplicaKeySensitive);
-		ventanaPrincipal.resaltarCoincidencias(inicios, rutaCadena.length());
+	    ArrayList<Integer> inicios = busquedaKMP.buscarPatron(contenidoArchivo, cadenaBuscar, aplicaKeySensitive);
 
+	    ventanaPrincipal.resaltarCoincidencias(inicios, cadenaBuscar.length());
 	}
+
 
 }
