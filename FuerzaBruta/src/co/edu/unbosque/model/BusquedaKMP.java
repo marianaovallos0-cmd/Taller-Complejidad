@@ -3,32 +3,25 @@ package co.edu.unbosque.model;
 import java.util.ArrayList;
 
 public class BusquedaKMP {
-	
 
 	public ArrayList<Integer> buscarPatron(String texto, String patron, boolean sensibleMayus) {
 		
 		ArrayList<Integer> posiciones = new ArrayList<>();
 		
-		// Validar las entradas
 		if (texto == null || patron == null || patron.isEmpty()) {
 			return posiciones;
 		}
 		
-		// Si no es sensible a mayusculas, convierte ambos a minusculas
 		if (!sensibleMayus) {
 			texto = texto.toLowerCase();
 			patron = patron.toLowerCase();
 		}
-		
-		/* Preprocesar patron: crear tabla LPS
-		 * LPS Es una tabla auxiliar (un arreglo de enteros) que usa el algoritmo KMP 
-		 * para evitar comparaciones innecesarias cuando hay un fallo parcial en la busqueda del patron.
-		 */
+
 		
 		int[] lps = construirLPS(patron);
 		
-		int i = 0; // indice en texto
-		int j = 0; // indice en patron
+		int i = 0;
+		int j = 0;
 		
 		while (i < texto.length()) {
 			

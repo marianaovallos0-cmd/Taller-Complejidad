@@ -1,8 +1,14 @@
 package co.edu.unbosque.view;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
-public class VentanaPrincipal extends JFrame {
+public class VentanaPrincipal extends JFrame   {
 	
 	private JTextArea areaDeTexto;
 	private JScrollPane scroll;
@@ -10,7 +16,8 @@ public class VentanaPrincipal extends JFrame {
 	private JButton btnBuscar;
 	private JTextField txtTexto;
 	private JCheckBox keySensitive;
-	
+	private File archivoSeleccionado;
+
 	public VentanaPrincipal() {
 		setTitle("Fuerza Bruta - Algoritmo KMP");
 		setSize(800,600);
@@ -25,6 +32,7 @@ public class VentanaPrincipal extends JFrame {
 	}
 	
 	private void inicializarComponentes() {
+
 		areaDeTexto = new JTextArea();
 		areaDeTexto.setEditable(false);
 		areaDeTexto.setLineWrap(true);
@@ -49,6 +57,8 @@ public class VentanaPrincipal extends JFrame {
 		btnCargarArchivo = new JButton("Cargar Archivo");
 		btnCargarArchivo.setBounds(20, 460, 200, 40);
 		add(btnCargarArchivo);
+
+		btnCargarArchivo.addActionListener(this::accionCargarArchivo);
 		
 		java.awt.Font fuenteGeneral = new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14);
 		areaDeTexto.setFont(fuenteGeneral);
@@ -57,12 +67,51 @@ public class VentanaPrincipal extends JFrame {
 		btnCargarArchivo.setFont(fuenteGeneral);
 		keySensitive.setFont(fuenteGeneral);
 
-		
-		
+	}
+
+	private void accionCargarArchivo(ActionEvent e) {
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int resp = chooser.showOpenDialog(this);
+		if (resp == JFileChooser.APPROVE_OPTION) {
+			File seleccionado = chooser.getSelectedFile();
+
+			if (seleccionado != null) {
+				try {
+					String contenido = Files.readString(seleccionado.toPath(), StandardCharsets.UTF_8);
+					archivoSeleccionado = seleccionado;
+					areaDeTexto.setText(contenido);
+					setTitle("Fuerza Bruta - Algoritmo KMP — " + seleccionado.getName());
+				} catch (IOException ex) {
+					JOptionPane.showMessageDialog(this, "No se pudo leer el archivo:\n" + ex.getMessage(),
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
+	}
+
+	public void popError(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public JTextArea getAreaDeTexto() {
 		return areaDeTexto;
+	}
+
+	public JButton getBtnBuscar() {
+		return btnBuscar;
+	}
+
+	public JTextField getTxtTexto() {
+		return txtTexto;
+	}
+
+	public JCheckBox getKeySensitive() {
+		return keySensitive;
+	}
+
+	public File getArchivoSeleccionado() {
+		return archivoSeleccionado;
 	}
 
 	public void setAreaDeTexto(JTextArea areaDeTexto) {
@@ -85,31 +134,19 @@ public class VentanaPrincipal extends JFrame {
 		this.btnCargarArchivo = btnCargarArchivo;
 	}
 
-	public JButton getBtnBuscar() {
-		return btnBuscar;
-	}
-
 	public void setBtnBuscar(JButton btnBuscar) {
 		this.btnBuscar = btnBuscar;
-	}
-
-	public JTextField getTxtTexto() {
-		return txtTexto;
 	}
 
 	public void setTxtTexto(JTextField txtTexto) {
 		this.txtTexto = txtTexto;
 	}
 
-	public JCheckBox getKeySensitive() {
-		return keySensitive;
-	}
-
 	public void setKeySensitive(JCheckBox keySensitive) {
 		this.keySensitive = keySensitive;
 	}
-	
-	
-	
 
+	public void setArchivoSeleccionado(File archivoSeleccionado) {
+		this.archivoSeleccionado = archivoSeleccionado;
+	}
 }

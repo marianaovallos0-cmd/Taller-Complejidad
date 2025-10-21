@@ -1,45 +1,34 @@
 package co.edu.unbosque.model;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+
 public class Archivo {
-	
-	public Archivo() {
-		
+
+	public String leerArchivo(String rutaArchivo) {
+		File archivo = new File(rutaArchivo);
+
+		if (!archivo.exists()) {
+			System.out.println("El archivo no existe: " + rutaArchivo);
+			return null;
+		}
+		if (!archivo.getName().toLowerCase().endsWith(".txt")) {
+			System.out.println("Solo se permiten archivos con extensión .txt");
+			return null;
+		}
+
+		try (BufferedReader lector = new BufferedReader(new FileReader(archivo))) {
+			StringBuilder contenido = new StringBuilder();
+			String linea;
+			while ((linea = lector.readLine()) != null) {
+				contenido.append(linea).append('\n');
+			}
+			return contenido.toString();
+		} catch (IOException e) {
+			return e.getMessage();
+		}
 	}
-	
-	public String cargarArchivo() {
-	    javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-	    int opcion = fileChooser.showOpenDialog(null);
-
-	    if (opcion == javax.swing.JFileChooser.APPROVE_OPTION) {
-	        java.io.File archivoSeleccionado = fileChooser.getSelectedFile();
-	        
-	        //Evitar que se suban archivos con extension diferente a .txt
-	        if (!archivoSeleccionado.getName().toLowerCase().endsWith(".txt")) {
-	            javax.swing.JOptionPane.showMessageDialog(null, "Solo se pueden cargar archivos con extensión .txt");
-	            return null;
-	        }
-
-	        try {
-	            java.io.BufferedReader lector = new java.io.BufferedReader(new java.io.FileReader(archivoSeleccionado));
-	            StringBuilder contenido = new StringBuilder();
-	            String linea;
-
-	            while ((linea = lector.readLine()) != null) {
-	                contenido.append(linea).append("\n");
-	            }
-
-	            lector.close();
-	            return contenido.toString();
-
-	        } catch (java.io.IOException e) {
-	            e.printStackTrace();
-	            return null;
-	        }
-	    } else {
-	        // Si el usuario cancela o cierra el cuadro de diálogo
-	        return null;
-	    }
-	}
-
-
 }
