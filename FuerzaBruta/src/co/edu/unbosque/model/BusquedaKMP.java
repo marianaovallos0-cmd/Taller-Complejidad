@@ -1,73 +1,58 @@
 package co.edu.unbosque.model;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BusquedaKMP {
-	
 
-	public ArrayList<Integer> buscarPatron(String texto, String patron, boolean sensibleMayus) {
-		
-		ArrayList<Integer> posiciones = new ArrayList<>();
-		
-		// Validar las entradas
-		if (texto == null || patron == null || patron.isEmpty()) {
-			return posiciones;
+	public ArrayList<Integer> buscarPatron(String texto, String patron, boolean caseSensitive) {
+		ArrayList<Integer> res = new ArrayList<>();
+		if (texto == null || patron == null) return res;
+		if (patron.isEmpty()) return res;
+
+		String t = texto;
+		String p = patron;
+
+		if (!caseSensitive) {
+			t = t.toLowerCase();
+			p = p.toLowerCase();
 		}
-		
-		// Si no es sensible a mayusculas, convierte ambos a minusculas
-		if (!sensibleMayus) {
-			texto = texto.toLowerCase();
-			patron = patron.toLowerCase();
-		}
-		
-		/* Preprocesar patron: crear tabla LPS
-		 * LPS Es una tabla auxiliar (un arreglo de enteros) que usa el algoritmo KMP 
-		 * para evitar comparaciones innecesarias cuando hay un fallo parcial en la busqueda del patron.
-		 */
-		
-		int[] lps = construirLPS(patron);
-		
-		int i = 0; // indice en texto
-		int j = 0; // indice en patron
-		
-		while (i < texto.length()) {
-			
-			if (texto.charAt(i) == patron.charAt(j)) {
-				i++;
-				j++;
-			}
-			
-			if (j == patron.length()) {
-				posiciones.add(i - j);  // Coincidencia completa
-				j = lps[j - 1];         // Continuar buscando
-			}
-			
-			else if (i < texto.length() && texto.charAt(i) != patron.charAt(j)) {
+
+		int n = t.length();
+		int m = p.length();
+		if (m > n) return res;
+
+		int[] lps = buildLps(p);
+		int i = 0; // índice en t
+		int j = 0; // índice en p
+
+		while (i < n) {
+			if (t.charAt(i) == p.charAt(j)) {
+				i++; j++;
+				if (j == m) {
+					// Match completo: (i - m) es el INICIO en el texto original
+					res.add(i - m);
+					j = lps[j - 1]; // continuar buscando
+				}
+			} else {
 				if (j != 0) {
-					j = lps[j - 1];     // Saltar segun tabla LPS
+					j = lps[j - 1];
 				} else {
-					i++;                // Avanzar texto
+					i++;
 				}
 			}
 		}
-		
-		return posiciones;
+		return res;
 	}
-	
-	/**
-	 * Construye la tabla LPS (Longest Prefix Suffix) del patron
-	 * Esta tabla indica para cada posición del patron cual es la
-	 * longitud del prefijo mas largo que tambien es sufijo.
-	 * 
-	 */
-	private int[] construirLPS(String patron) {
-		
-		int[] lps = new int[patron.length()];
-		int len = 0; // longitud del prefijo-sufijo anterior
+
+	private int[] buildLps(String p) {
+		int m = p.length();
+		int[] lps = new int[m];
+		int len = 0;
 		int i = 1;
-		
-		while (i < patron.length()) {
-			if (patron.charAt(i) == patron.charAt(len)) {
+		while (i < m) {
+			if (p.charAt(i) == p.charAt(len)) {
 				len++;
 				lps[i] = len;
 				i++;
@@ -80,7 +65,12 @@ public class BusquedaKMP {
 				}
 			}
 		}
-		
 		return lps;
+	}
+
+	@SuppressWarnings("unused")
+	private String quitarAcentos(String s) {
+		String n = Normalizer.normalize(s, Normalizer.Form.NFD);
+		return n.replaceAll("\\p{M}", "");
 	}
 }

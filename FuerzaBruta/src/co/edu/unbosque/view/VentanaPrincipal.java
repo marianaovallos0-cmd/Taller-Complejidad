@@ -1,8 +1,18 @@
 package co.edu.unbosque.view;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
 
-public class VentanaPrincipal extends JFrame {
+public class VentanaPrincipal extends JFrame   {
 	
 	private JTextArea areaDeTexto;
 	private JScrollPane scroll;
@@ -10,7 +20,14 @@ public class VentanaPrincipal extends JFrame {
 	private JButton btnBuscar;
 	private JTextField txtTexto;
 	private JCheckBox keySensitive;
-	
+	private File archivoSeleccionado;
+
+	private static final Highlighter.HighlightPainter MATCH_PAINTER =
+			new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 235, 59));
+
+	private final JLabel lblResultados = new JLabel("0 coincidencias");
+
+
 	public VentanaPrincipal() {
 		setTitle("Fuerza Bruta - Algoritmo KMP");
 		setSize(800,600);
@@ -20,11 +37,11 @@ public class VentanaPrincipal extends JFrame {
 		setLocationRelativeTo(null); 
 	
 		inicializarComponentes();
-		
 		setVisible(true);
 	}
 	
 	private void inicializarComponentes() {
+
 		areaDeTexto = new JTextArea();
 		areaDeTexto.setEditable(false);
 		areaDeTexto.setLineWrap(true);
@@ -49,6 +66,8 @@ public class VentanaPrincipal extends JFrame {
 		btnCargarArchivo = new JButton("Cargar Archivo");
 		btnCargarArchivo.setBounds(20, 460, 200, 40);
 		add(btnCargarArchivo);
+
+		btnCargarArchivo.addActionListener(this::accionCargarArchivo);
 		
 		java.awt.Font fuenteGeneral = new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14);
 		areaDeTexto.setFont(fuenteGeneral);
@@ -57,59 +76,85 @@ public class VentanaPrincipal extends JFrame {
 		btnCargarArchivo.setFont(fuenteGeneral);
 		keySensitive.setFont(fuenteGeneral);
 
-		
-		
 	}
 
-	public JTextArea getAreaDeTexto() {
-		return areaDeTexto;
+	private void accionCargarArchivo(ActionEvent e) {
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int resp = chooser.showOpenDialog(this);
+		if (resp == JFileChooser.APPROVE_OPTION) {
+			File seleccionado = chooser.getSelectedFile();
+
+			if (seleccionado != null) {
+				try {
+					String contenido = Files.readString(seleccionado.toPath(), StandardCharsets.UTF_8);
+					archivoSeleccionado = seleccionado;
+					areaDeTexto.setText(contenido);
+					setTitle("Fuerza Bruta - Algoritmo KMP — " + seleccionado.getName());
+				} catch (IOException ex) {
+					JOptionPane.showMessageDialog(this, "No se pudo leer el archivo:\n" + ex.getMessage(),
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
 	}
 
-	public void setAreaDeTexto(JTextArea areaDeTexto) {
-		this.areaDeTexto = areaDeTexto;
+	public void limpiarResaltado() {
+		areaDeTexto.getHighlighter().removeAllHighlights();
+		lblResultados.setText("0 coincidencias");
 	}
 
-	public JScrollPane getScroll() {
-		return scroll;
-	}
 
-	public void setScroll(JScrollPane scroll) {
-		this.scroll = scroll;
-	}
+	public void resaltarCoincidencias(ArrayList<Integer> inicios, int largoPatron) {
+		Highlighter h = areaDeTexto.getHighlighter();
+		h.removeAllHighlights();
 
-	public JButton getBtnCargarArchivo() {
-		return btnCargarArchivo;
-	}
+		if (inicios == null || inicios.isEmpty() || largoPatron <= 0) {
+			lblResultados.setText("0 coincidencias");
+			return;
+		}
 
-	public void setBtnCargarArchivo(JButton btnCargarArchivo) {
-		this.btnCargarArchivo = btnCargarArchivo;
+		int docLen = areaDeTexto.getDocument().getLength();
+
+		for (Integer start : inicios) {
+			if (start == null) continue;
+			int desde = Math.max(0, start);
+			int hasta = Math.min(desde + largoPatron, docLen);
+			if (hasta > desde) {
+				try {
+					h.addHighlight(desde, hasta, MATCH_PAINTER);
+				} catch (BadLocationException ignored) {}
+			}
+		}
+
+		try {
+			int first = Math.min(inicios.get(0), docLen);
+			areaDeTexto.setCaretPosition(first);
+			Rectangle r;
+			try {
+				r = areaDeTexto.modelToView2D(first).getBounds();
+			} catch (Throwable t) {
+				r = areaDeTexto.modelToView(first);
+			}
+			if (r != null) areaDeTexto.scrollRectToVisible(r);
+		} catch (Exception ignored) {}
+
+		lblResultados.setText(inicios.size() + " coincidencia(s)");
+		areaDeTexto.requestFocusInWindow();
 	}
 
 	public JButton getBtnBuscar() {
 		return btnBuscar;
 	}
-
-	public void setBtnBuscar(JButton btnBuscar) {
-		this.btnBuscar = btnBuscar;
-	}
-
 	public JTextField getTxtTexto() {
 		return txtTexto;
 	}
-
-	public void setTxtTexto(JTextField txtTexto) {
-		this.txtTexto = txtTexto;
-	}
-
 	public JCheckBox getKeySensitive() {
 		return keySensitive;
 	}
-
-	public void setKeySensitive(JCheckBox keySensitive) {
-		this.keySensitive = keySensitive;
+	public File getArchivoSeleccionado() {
+		return archivoSeleccionado;
 	}
-	
-	
-	
+
 
 }
