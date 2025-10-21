@@ -15,9 +15,10 @@ public class BusquedaKMP {
 		String p = patron;
 
 		if (!caseSensitive) {
-			t = t.toLowerCase();
-			p = p.toLowerCase();
+		    t = quitarAcentos(t.toLowerCase());
+		    p = quitarAcentos(p.toLowerCase());
 		}
+
 
 		int n = t.length();
 		int m = p.length();
