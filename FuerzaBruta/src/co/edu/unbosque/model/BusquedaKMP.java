@@ -2,7 +2,6 @@ package co.edu.unbosque.model;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.List;
 
 public class BusquedaKMP {
 
@@ -18,7 +17,6 @@ public class BusquedaKMP {
 		    t = quitarAcentos(t.toLowerCase());
 		    p = quitarAcentos(p.toLowerCase());
 		}
-
 
 		int n = t.length();
 		int m = p.length();

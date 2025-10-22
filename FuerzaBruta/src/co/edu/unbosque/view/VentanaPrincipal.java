@@ -23,7 +23,7 @@ public class VentanaPrincipal extends JFrame   {
 	private File archivoSeleccionado;
 
 	private static final Highlighter.HighlightPainter MATCH_PAINTER =
-			new DefaultHighlighter.DefaultHighlightPainter(new Color(255, 235, 59));
+			new DefaultHighlighter.DefaultHighlightPainter(new Color(59, 255, 69));
 
 	private final JLabel lblResultados = new JLabel("0 coincidencias");
 
@@ -110,12 +110,6 @@ public class VentanaPrincipal extends JFrame   {
 		}
 	}
 
-	public void limpiarResaltado() {
-		areaDeTexto.getHighlighter().removeAllHighlights();
-		lblResultados.setText("0 coincidencias");
-	}
-
-
 	public void resaltarCoincidencias(ArrayList<Integer> inicios, int largoPatron) {
 		Highlighter h = areaDeTexto.getHighlighter();
 		h.removeAllHighlights();
@@ -154,6 +148,10 @@ public class VentanaPrincipal extends JFrame   {
 		areaDeTexto.requestFocusInWindow();
 	}
 
+	public void ShowMessage(String mensaje) {
+		JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+
 	public JButton getBtnBuscar() {
 		return btnBuscar;
 	}
@@ -162,9 +160,6 @@ public class VentanaPrincipal extends JFrame   {
 	}
 	public JCheckBox getKeySensitive() {
 		return keySensitive;
-	}
-	public File getArchivoSeleccionado() {
-		return archivoSeleccionado;
 	}
 	public String getTextoArea() {
 	    return areaDeTexto.getText();
